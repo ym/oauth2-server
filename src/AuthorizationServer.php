@@ -260,8 +260,16 @@ class AuthorizationServer extends AbstractServer
      * @throws
      */
     public function issueAccessToken()
-    {
-        $grantType = $this->getRequest()->request->get('grant_type');
+   	 {
+        if(strpos($this->getRequest()->getContentType(), 'json') !== false) {
+            $content = json_decode($this->getRequest()->getContent(), true);
+            if(is_array($content) && isset($content['grant_type'])) {
+                $grantType = $content['grant_type'];
+            }
+        }
+        if(!isset($grantType)) {
+            $grantType = $this->getRequest()->request->get('grant_type');
+        }
         if (is_null($grantType)) {
             throw new Exception\InvalidRequestException('grant_type');
         }
